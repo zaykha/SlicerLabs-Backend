@@ -33,7 +33,7 @@ const authenticateUser = (req, res, next) => {
 };
 // authenticateUser,
 // Example of API endpoint to calculate mass and print time
-MiddleWareapp.post("/calculate",  (req, res) => {
+MiddleWareapp.post("/calculate", authenticateUser, (req, res) => {
   const { material, color, dimensions } = req.body;
 
   // Validate the input values
@@ -62,6 +62,27 @@ MiddleWareapp.post("/calculate",  (req, res) => {
 
   // Return the calculated price as the response
   res.json({ price });
+});
+
+MiddleWareapp.get("/calculate-function", authenticateUser, (req, res) => {
+  // Return the entire calculatePrice function as part of the response
+  res.json({ 
+    calculatePrice: calculatePrice.toString() ,
+  });
+});
+
+MiddleWareapp.post("/validate-price", authenticateUser, (req, res) => {
+  const { material, color, dimensions, expectedPrice } = req.body;
+
+  // Call the calculatePrice function to calculate the actual price
+  const actualPrice = calculatePrice(material, color, dimensions);
+
+  // Compare the actual price with the expected price from the client-side
+  if (actualPrice === expectedPrice) {
+    res.json({ valid: true });
+  } else {
+    res.json({ valid: false });
+  }
 });
 
 // Export the express app
