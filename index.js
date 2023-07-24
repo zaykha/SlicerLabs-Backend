@@ -5,7 +5,7 @@ import cors from 'cors';
 const app = express();
 const port = 3000; // Choose the port you want to run your server on
 // Enable CORS
-const allowedOrigins = ['http://127.0.0.1:5173'];
+const allowedOrigins = ['http://127.0.0.1:5173', 'https://checkout.stripe.com'];
 app.use(cors({
   origin: (origin, callback) => {
     if (allowedOrigins.includes(origin) || !origin) {

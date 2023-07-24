@@ -1,8 +1,10 @@
 // middleware.js
 import express from "express";
-import  admin  from "firebase-admin";
+import admin from "firebase-admin";
 import calculatePrice from "./CalculatePrice.js";
 import serviceAccount from "../secrets/slicerlabs-c10ea-firebase-adminsdk-b7iak-aec1952b84.mjs";
+import stripe from "./stripconfig.js";
+
 const MiddleWareapp = express();
 
 admin.initializeApp({
@@ -31,6 +33,31 @@ const authenticateUser = (req, res, next) => {
       return res.status(401).json({ message: "Invalid token" });
     });
 };
+
+const isValidPromoCode = (promoCode) => {
+  // Here, you can query your database or Firebase to check if the promo code exists and is valid.
+  // You may also want to check if the promo code has not expired.
+
+  // For example, assuming you have promo codes stored in an array or database:
+  const validPromoCodes = [
+    { code: "SUMMER2023", discountPercentage: 10, validUntil: "2023-08-31" },
+    // Add more valid promo codes here
+  ];
+
+  // Find the promo code in the array of valid promo codes
+  const validPromo = validPromoCodes.find(
+    (promo) =>
+      promo.code === promoCode && new Date() <= new Date(promo.validUntil)
+  );
+
+  if (validPromo) {
+    return validPromo.discountPercentage; // Return the discount percentage if the code is valid
+  }
+
+  // Return false if the promo code is not valid
+  return false;
+};
+
 // authenticateUser,
 // Example of API endpoint to calculate mass and print time
 MiddleWareapp.post("/calculate", authenticateUser, (req, res) => {
@@ -66,24 +93,158 @@ MiddleWareapp.post("/calculate", authenticateUser, (req, res) => {
 
 MiddleWareapp.get("/calculate-function", authenticateUser, (req, res) => {
   // Return the entire calculatePrice function as part of the response
-  res.json({ 
-    calculatePrice: calculatePrice.toString() ,
+  res.json({
+    calculatePrice: calculatePrice.toString(),
   });
 });
 
 MiddleWareapp.post("/validate-price", authenticateUser, (req, res) => {
-  const { material, color, dimensions, expectedPrice } = req.body;
+  const items = req.body;
 
-  // Call the calculatePrice function to calculate the actual price
-  const actualPrice = calculatePrice(material, color, dimensions);
+  if (!Array.isArray(items) || items.length === 0) {
+    return res.status(400).json({ error: "Invalid request body" });
+  }
 
-  // Compare the actual price with the expected price from the client-side
-  if (actualPrice === expectedPrice) {
+  let isValid = true;
+  items.forEach((item) => {
+    const { material, color, dimensions, quantity, price } = item;
+    const actualPrice = calculatePrice(material, color, dimensions);
+    const totalPrice = actualPrice * quantity;
+
+    if (totalPrice !== price) {
+      isValid = false;
+    }
+  });
+
+  if (isValid) {
     res.json({ valid: true });
   } else {
     res.json({ valid: false });
   }
 });
+
+MiddleWareapp.post("/calculate-shipping", authenticateUser, (req, res) => {
+  const { shippingOption, distance } = req.body;
+
+  // Validate the input value
+  if (!shippingOption) {
+    return res.status(400).json({ error: "Missing required field" });
+  }
+
+  // Implement your shipping cost calculation logic based on the selected shipping option
+  let shippingCost = 0;
+  if (shippingOption === "NML") {
+    shippingCost = 10; // Example shipping cost for ABS express shipping
+  } else if (shippingOption === "EXP") {
+    shippingCost = 5; // Example shipping cost for PLA normal shipping
+  } else {
+    return res.status(400).json({ error: "Invalid shipping option" });
+  }
+
+  // Return the calculated shipping cost as the response
+  res.json({ shippingCost });
+});
+
+MiddleWareapp.post("/apply-promo", authenticateUser, (req, res) => {
+  const { promoCode } = req.body;
+
+  // Validate the input value
+  if (!promoCode) {
+    return res.status(400).json({ error: "Missing required field" });
+  }
+
+  // Implement your promo code handling logic here
+  // You can check if the promo code is valid and calculate the discount accordingly
+
+  // For example, let's assume promo code "SUMMER10" gives a 10% discount
+  if (promoCode === "SUMMER10") {
+    // Get the total items cost from the request body
+    const { totalItemsCost } = req.body;
+
+    // Calculate the discount amount
+    const discountAmount = (10 / 100) * totalItemsCost;
+
+    // Return the discount amount as the response
+    return res.json({ discountAmount });
+  }
+
+  // If the promo code is invalid, return an error response
+  return res.status(400).json({ error: "Invalid promo code" });
+});
+
+MiddleWareapp.post("/apply-promo-code", authenticateUser, (req, res) => {
+  const { promoCode } = req.body;
+
+  // Validate the input value
+  if (!promoCode) {
+    return res.status(400).json({ error: "Missing promo code" });
+  }
+
+  // Validate the promo code using the isValidPromoCode function
+  const discountPercentage = isValidPromoCode(promoCode);
+
+  if (discountPercentage !== false) {
+    // If the promo code is valid, you can calculate the discounted amount and return it as the response
+    // For example, if the order total is $100, and the discountPercentage is 10 (10%),
+    // then the discounted amount will be $100 * 0.1 = $10, and the final amount will be $100 - $10 = $90.
+
+    // Apply your calculation logic here and return the discounted amount
+    const orderTotal = 100; // Replace this with the actual order total
+    const discountedAmount = orderTotal * (discountPercentage / 100);
+    const finalAmount = orderTotal - discountedAmount;
+
+    res.json({ finalAmount, discountPercentage });
+  } else {
+    res.status(400).json({ error: "Invalid promo code" });
+  }
+});
+
+MiddleWareapp.post(
+  "/create-checkout-session",
+  // authenticateUser,
+  async (req, res) => {
+    const items = req.body;
+    console.log(items);
+    
+    // Create a line_items array for the Stripe checkout session
+    const lineItems = items.map((item) => {
+      const { material, color, dimensions, price, itemId, quantity } = item;
+      return {
+        price_data: {
+          currency: "sgd",
+          unit_amount: Math.round(price * 100), // Convert price to cents
+          product_data: {
+            // productId: itemId,
+            name: itemId, // You can use the material as the name of the product
+            description: color, // You can use the color as the description of the product
+            metadata: {
+              material,
+              dimensions: JSON.stringify(dimensions),
+            },
+            images: [], // You can include image URLs if you have them
+          },
+        },
+        quantity: quantity,
+      };
+    });
+
+    try {
+      const session = await stripe.checkout.sessions.create({
+        line_items: lineItems,
+        mode: "payment",
+        success_url: "http://localhost:4242/success",
+        cancel_url: "http://localhost:4242/cancel",
+      });
+
+      res.redirect(303, session.url);
+    } catch (error) {
+      // Handle any error that occurred during the creation of the checkout session
+      console.error("Error creating checkout session:", error);
+      res.status(500).json({ error: "Failed to create checkout session" });
+    }
+  }
+);
+
 
 // Export the express app
 export default MiddleWareapp;
