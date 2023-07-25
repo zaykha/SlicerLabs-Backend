@@ -7,13 +7,18 @@ import stripe from "./stripconfig.js";
 
 const MiddleWareapp = express();
 
+const corsHeader = {
+  "Access-Control-Allow-origin": "*",
+  "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE,OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization",
+};
+
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
   databaseURL:
     "https://slicerlabs-c10ea-default-rtdb.asia-southeast1.firebasedatabase.app",
 });
 
-// middleware.js
 const authenticateUser = (req, res, next) => {
   const idToken = req.headers.authorization;
 
@@ -205,7 +210,7 @@ MiddleWareapp.post(
   async (req, res) => {
     const items = req.body;
     console.log(items);
-    
+    const {userUID} = req.body;
     // Create a line_items array for the Stripe checkout session
     const lineItems = items.map((item) => {
       const { material, color, dimensions, price, itemId, quantity } = item;
@@ -215,8 +220,8 @@ MiddleWareapp.post(
           unit_amount: Math.round(price * 100), // Convert price to cents
           product_data: {
             // productId: itemId,
-            name: itemId, // You can use the material as the name of the product
-            description: color, // You can use the color as the description of the product
+            name: itemId,
+            description: color,
             metadata: {
               material,
               dimensions: JSON.stringify(dimensions),
@@ -232,11 +237,22 @@ MiddleWareapp.post(
       const session = await stripe.checkout.sessions.create({
         line_items: lineItems,
         mode: "payment",
-        success_url: "http://localhost:4242/success",
-        cancel_url: "http://localhost:4242/cancel",
+        success_url: `http://127.0.0.1:5173/success?user_id=${userUID}`,
+        cancel_url: `http://127.0.0.1:5173/cancel?user_id=${userUID}`,
       });
+      // Replace the placeholders with the actual session ID
+      const successUrl = session.success_url.replace(
+        "{CHECKOUT_SESSION_ID}",
+        session.id
+      );
+      const cancelUrl = session.cancel_url.replace(
+        "{CHECKOUT_SESSION_ID}",
+        session.id
+      );
 
-      res.redirect(303, session.url);
+      res.status(200).json({ url: session.url });
+
+      // return res.json(session);
     } catch (error) {
       // Handle any error that occurred during the creation of the checkout session
       console.error("Error creating checkout session:", error);
@@ -244,7 +260,11 @@ MiddleWareapp.post(
     }
   }
 );
-
+const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+// middleware.js
+MiddleWareapp.get("/get-stripe-key", (req, res) => {
+  res.json({ publishableKey: stripeSecretKey });
+});
 
 // Export the express app
 export default MiddleWareapp;
