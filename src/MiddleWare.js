@@ -238,17 +238,8 @@ MiddleWareapp.post(
         line_items: lineItems,
         mode: "payment",
         success_url: `http://127.0.0.1:5173/success?user_id=${userUID}`,
-        cancel_url: `http://127.0.0.1:5173/cancel?user_id=${userUID}`,
+        cancel_url: `http://127.0.0.1:5173/cart`,
       });
-      // Replace the placeholders with the actual session ID
-      const successUrl = session.success_url.replace(
-        "{CHECKOUT_SESSION_ID}",
-        session.id
-      );
-      const cancelUrl = session.cancel_url.replace(
-        "{CHECKOUT_SESSION_ID}",
-        session.id
-      );
 
       res.status(200).json({ url: session.url });
 
