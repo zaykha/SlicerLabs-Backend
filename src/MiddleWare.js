@@ -209,8 +209,9 @@ MiddleWareapp.post(
   // authenticateUser,
   async (req, res) => {
     const items = req.body;
-    console.log(items);
-    const {userUID} = req.body;
+    
+    const userUID = items[0].userUID;
+    console.log(items,userUID);
     // Create a line_items array for the Stripe checkout session
     const lineItems = items.map((item) => {
       const { material, color, dimensions, price, itemId, quantity } = item;
