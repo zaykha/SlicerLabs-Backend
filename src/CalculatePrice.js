@@ -103,10 +103,9 @@
 // }
 
 
-export default function calculatePrice(material, color, dimensions) {
+export default function calculatePrice(material, color, dimensions, materialSettings) {
   // Check if dimensions is defined, if not, set it to an empty object
   dimensions = dimensions || {};
-
   // Define the density values for different materials
   const densityValues = {
     ABS: 1.04,     // g/cm^3
@@ -118,7 +117,7 @@ export default function calculatePrice(material, color, dimensions) {
   };
 
   // Define the print time per unit volume for different materials (in minutes)
-  const printTimePerUnitVolume = {
+  const defaultPrintTimePerUnitVolume  = {
     ABS: 0.05,     // minutes/cm^3
     PLA: 0.04,     // minutes/cm^3
     TPU: 0.06,     // minutes/cm^3
@@ -127,8 +126,12 @@ export default function calculatePrice(material, color, dimensions) {
     RESIN: 0.03    // minutes/cm^3
   };
 
+  const printTimePerUnitVolume = materialSettings
+  ? materialSettings.printTimePerUnitVolume
+  : defaultPrintTimePerUnitVolume;
+
   // Define the base cost per gram for different materials
-  const materialCosts = {
+  const defaultmaterialCosts = {
     ABS: 0.05, // SGD per gram
     PLA: 0.04, // SGD per gram
     TPU: 0.06, // SGD per gram
@@ -137,14 +140,18 @@ export default function calculatePrice(material, color, dimensions) {
     Resin: 0.1, // SGD per gram
   };
 
+  const materialCosts = materialSettings
+  ? materialSettings.materialCosts
+  : defaultmaterialCosts;
+
   // Define the hourly machine usage rate
-  const hourlyRate = 20; // SGD per hour
+  const hourlyRate = materialSettings? materialSettings.hourlyRate: 20; // SGD per hour
 
   // Define the labor cost per hour for post-processing tasks
-  const laborCost = 25; // SGD per hour
+  const laborCost = materialSettings? materialSettings.laborCost: 25; // SGD per hour
 
   // Define any additional overhead costs per print or per hour
-  const overheadCost = 5; // SGD per print or per hour
+  const overheadCost = materialSettings? materialSettings.overheadCost: 5; // SGD per print or per hour
 
 
   // Calculate mass and print time using the calculateMassAndPrintTime function
