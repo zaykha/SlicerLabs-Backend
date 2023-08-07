@@ -4,6 +4,7 @@ import admin from "firebase-admin";
 import calculatePrice from "./CalculatePrice.js";
 import serviceAccount from "../secrets/slicerlabs-c10ea-firebase-adminsdk-b7iak-aec1952b84.mjs";
 import stripe from "./stripconfig.js";
+import fetch from "node-fetch";
 
 const MiddleWareapp = express();
 
@@ -252,6 +253,23 @@ MiddleWareapp.post(
     }
   }
 );
+MiddleWareapp.get("/validate-email", async (req, res) => {
+  const { email } = req.query;
+  console.log(email)
+  const token = "80fbc8ce7e0f482d9f5f36e50cb11389";
+  const apiUrl = `https://api.ValidEmail.net/?email=${encodeURIComponent(email)}&token=${token}`;
+
+  try {
+    const response = await fetch(apiUrl);
+    const data = await response.json();
+    res.json(data);
+  } catch (error) {
+    console.log("Error validating email:", error);
+    res.status(500).json({ error: "Error validating email" });
+  }
+});
+
+
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
 // middleware.js
 MiddleWareapp.get("/get-stripe-key", (req, res) => {
