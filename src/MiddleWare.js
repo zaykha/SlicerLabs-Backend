@@ -5,6 +5,9 @@ import calculatePrice from "./CalculatePrice.js";
 import serviceAccount from "../secrets/slicerlabs-c10ea-firebase-adminsdk-b7iak-aec1952b84.mjs";
 import stripe from "./stripconfig.js";
 import fetch from "node-fetch";
+import { getAuth, updateEmail } from "firebase/auth";
+import { collection, doc, getDoc } from "firebase/firestore";
+import { auth, db } from "../firebaseconfig.js";
 
 const MiddleWareapp = express();
 
@@ -13,7 +16,7 @@ const corsHeader = {
   "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE,OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type, Authorization",
 };
-
+// const auth = getAuth();
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
   databaseURL:
@@ -63,7 +66,22 @@ const isValidPromoCode = (promoCode) => {
   // Return false if the promo code is not valid
   return false;
 };
+async function getUserFromDatabase(userId) {
+  try {
+    // Fetch user document from Firestore
+    const userDoc = await getDoc(doc(collection(db, 'users'), userId));
 
+    if (userDoc.exists()) {
+      // Return user data from the document
+      return userDoc.data();
+    } else {
+      throw new Error('User not found');
+    }
+  } catch (error) {
+    console.error('Error fetching user from database:', error);
+    throw error;
+  }
+}
 // authenticateUser,
 // Example of API endpoint to calculate mass and print time
 MiddleWareapp.post("/calculate", authenticateUser, (req, res) => {
@@ -104,7 +122,7 @@ MiddleWareapp.get("/calculate-function", authenticateUser, (req, res) => {
   });
 });
 
-MiddleWareapp.post("/validate-price", authenticateUser, (req, res) => {
+MiddleWareapp.post("/validate-price", (req, res) => {
   const items = req.body;
 
   if (!Array.isArray(items) || items.length === 0) {
@@ -255,7 +273,7 @@ MiddleWareapp.post(
 );
 MiddleWareapp.get("/validate-email", async (req, res) => {
   const { email } = req.query;
-  console.log(email)
+ 
   const token = "80fbc8ce7e0f482d9f5f36e50cb11389";
   const apiUrl = `https://api.ValidEmail.net/?email=${encodeURIComponent(email)}&token=${token}`;
 
@@ -269,7 +287,29 @@ MiddleWareapp.get("/validate-email", async (req, res) => {
   }
 });
 
+// Route to update user email
+MiddleWareapp.post('/update-email', async (req, res) => {
+  const { userId, newEmail } = req.body;
 
+  try {
+   
+      // Fetch user data from your database (e.g., Firestore)
+      const userData = await getUserFromDatabase(userId);
+      console.log(userData);
+      // Check if the new email is valid and verified
+      if (userData.email === newEmail && userData.isEmailVerified) {
+        // Update the user's email in Firebase Auth
+        await updateEmail(user, newEmail);
+
+        res.status(200).json({ message: 'Email updated successfully' });
+      } else {
+        res.status(400).json({ error: 'Invalid email or email not verified' });
+      }
+  } catch (error) {
+    console.error('Error updating email:', error);
+    res.status(500).json({ error: 'An error occurred while updating email' });
+  }
+});
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
 // middleware.js
 MiddleWareapp.get("/get-stripe-key", (req, res) => {
