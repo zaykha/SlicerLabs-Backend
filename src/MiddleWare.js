@@ -134,12 +134,12 @@ MiddleWareapp.post("/validate-price", (req, res) => {
     const { material, color, dimensions, quantity, price } = item;
     const actualPrice = calculatePrice(material, color, dimensions);
     const totalPrice = actualPrice * quantity;
-
-    if (totalPrice !== price) {
+    console.log(totalPrice, price, quantity);
+    if (totalPrice !== price*quantity) {
       isValid = false;
     }
   });
-
+  
   if (isValid) {
     res.json({ valid: true });
   } else {
