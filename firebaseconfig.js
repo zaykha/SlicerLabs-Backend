@@ -26,3 +26,4 @@ export const db = getDatabase(app);
 export const firestore = getFirestore(app);
 export const usersCollection = collection(firestore, "users");
 export const PurchasedItemsCollection = collection(firestore, "PurchasedItems");
+export const ConfigCollection = collection(firestore, "ConfigSettings");

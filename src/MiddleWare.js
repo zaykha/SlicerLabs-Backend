@@ -7,7 +7,7 @@ import stripe from "./stripconfig.js";
 import fetch from "node-fetch";
 import { getAuth, updateEmail } from "firebase/auth";
 import { collection, doc, getDoc } from "firebase/firestore";
-import { auth, db } from "../firebaseconfig.js";
+import { ConfigCollection, auth, db } from "../firebaseconfig.js";
 
 const MiddleWareapp = express();
 
@@ -122,19 +122,35 @@ MiddleWareapp.get("/calculate-function", authenticateUser, (req, res) => {
   });
 });
 
+const fetchConfigSettings = async (userUIDInLocalStorage) => {
+  
+  try {
+    const configDocRef = doc(ConfigCollection, userUIDInLocalStorage); // Replace with your collection and document IDs
+    const configDocSnapshot = await getDoc(configDocRef);
+
+    if (configDocSnapshot.exists()) {
+      const data = configDocSnapshot.data();
+      console.log(data)
+    }
+    // console.log(materialSettings);
+  } catch (error) {
+    console.error("Error fetching configuration settings:", error);
+  }
+
+};
 MiddleWareapp.post("/validate-price", (req, res) => {
   const items = req.body;
-
+  // console.log(items)
   if (!Array.isArray(items) || items.length === 0) {
     return res.status(400).json({ error: "Invalid request body" });
   }
-
+  // fetchConfigSettings(items[0].itemId)
   let isValid = true;
   items.forEach((item) => {
-    const { material, color, dimensions, quantity, price } = item;
-    const actualPrice = calculatePrice(material, color, dimensions);
+    const { material, color, dimensions, quantity, price, materialSettings } = item;
+    const actualPrice = calculatePrice(material, color, dimensions, materialSettings);
     const totalPrice = actualPrice * quantity;
-    console.log(totalPrice, price, quantity);
+    // console.log(actualPrice, totalPrice, price, quantity);
     if (totalPrice !== price*quantity) {
       isValid = false;
     }
