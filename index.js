@@ -7,6 +7,7 @@ const port = 3000; // Choose the port you want to run your server on
 // Enable CORS
 const allowedOrigins = [
   "https://main--slicerlabs.netlify.app",
+  "https://slicerlabs.netlify.app",
   "https://checkout.stripe.com",
   "http://192.168.1.5:5173",
 ];
