@@ -2,7 +2,7 @@
 import express from "express";
 import admin from "firebase-admin";
 import calculatePrice from "./CalculatePrice.js";
-import serviceAccount from "../secrets/slicerlabs-c10ea-firebase-adminsdk-b7iak-aec1952b84.mjs";
+// import serviceAccount from "../secrets/slicerlabs-c10ea-firebase-adminsdk-b7iak-aec1952b84.mjs";
 import stripe from "./stripconfig.js";
 import fetch from "node-fetch";
 // import { getAuth, updateEmail } from "firebase/auth";
@@ -17,8 +17,10 @@ const corsHeader = {
   "Access-Control-Allow-Headers": "Content-Type, Authorization",
 };
 // const auth = getAuth();
+const firebaseAdminSdkCredentials = JSON.parse(process.env.FIREBASE_ADMIN_SDK_CREDENTIALS);
+
 admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
+  credential: admin.credential.cert(firebaseAdminSdkCredentials),
   databaseURL:
     "https://slicerlabs-c10ea-default-rtdb.asia-southeast1.firebasedatabase.app",
 });
