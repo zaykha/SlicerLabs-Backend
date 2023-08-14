@@ -18,7 +18,7 @@ const corsHeader = {
 };
 // const auth = getAuth();
 const firebaseAdminSdkCredentials =  JSON.parse(process.env.FIREBASE_ADMIN_SDK_CREDENTIALS);
-console.log(firebaseAdminSdkCredentials)
+// console.log(firebaseAdminSdkCredentials)
 admin.initializeApp({
   credential: admin.credential.cert(firebaseAdminSdkCredentials),
   databaseURL:
