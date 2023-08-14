@@ -17,8 +17,8 @@ const corsHeader = {
   "Access-Control-Allow-Headers": "Content-Type, Authorization",
 };
 // const auth = getAuth();
-const firebaseAdminSdkCredentials = JSON.parse(process.env.FIREBASE_ADMIN_SDK_CREDENTIALS);
-
+const firebaseAdminSdkCredentials =  JSON.parse(process.env.FIREBASE_ADMIN_SDK_CREDENTIALS);
+console.log(firebaseAdminSdkCredentials)
 admin.initializeApp({
   credential: admin.credential.cert(firebaseAdminSdkCredentials),
   databaseURL:
@@ -278,8 +278,8 @@ MiddleWareapp.post(
         success_url: `https://slicerlabs.netlify.app/success?user_id=${userUID}`,
         cancel_url: `https://slicerlabs.netlify.app/cart?returning_user_id=${userUID}`,
       });
-
-      res.status(200).json({ url: session.url });
+      res.redirect(session.url)
+      // res.status(200).json({ url: session.url });
 
       // return res.json(session);
     } catch (error) {
