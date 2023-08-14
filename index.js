@@ -21,6 +21,6 @@ app.use(cors({
 app.use(express.json()); // To parse JSON request bodies
 app.use(MiddleWareapp);
 
-app.listen(port, () => {
+app.listen(process.env.PORT ||port, () => {
   console.log(`Server is running on port ${port}`);
 });

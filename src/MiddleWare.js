@@ -5,9 +5,9 @@ import calculatePrice from "./CalculatePrice.js";
 import serviceAccount from "../secrets/slicerlabs-c10ea-firebase-adminsdk-b7iak-aec1952b84.mjs";
 import stripe from "./stripconfig.js";
 import fetch from "node-fetch";
-import { getAuth, updateEmail } from "firebase/auth";
-import { collection, doc, getDoc } from "firebase/firestore";
-import { ConfigCollection, auth, db } from "../firebaseconfig.js";
+// import { getAuth, updateEmail } from "firebase/auth";
+// import { collection, doc, getDoc } from "firebase/firestore";
+// import { ConfigCollection, auth, db } from "../firebaseconfig.js";
 
 const MiddleWareapp = express();
 
@@ -66,22 +66,22 @@ const isValidPromoCode = (promoCode) => {
   // Return false if the promo code is not valid
   return false;
 };
-async function getUserFromDatabase(userId) {
-  try {
-    // Fetch user document from Firestore
-    const userDoc = await getDoc(doc(collection(db, 'users'), userId));
+// async function getUserFromDatabase(userId) {
+//   try {
+//     // Fetch user document from Firestore
+//     const userDoc = await getDoc(doc(collection(db, 'users'), userId));
 
-    if (userDoc.exists()) {
-      // Return user data from the document
-      return userDoc.data();
-    } else {
-      throw new Error('User not found');
-    }
-  } catch (error) {
-    console.error('Error fetching user from database:', error);
-    throw error;
-  }
-}
+//     if (userDoc.exists()) {
+//       // Return user data from the document
+//       return userDoc.data();
+//     } else {
+//       throw new Error('User not found');
+//     }
+//   } catch (error) {
+//     console.error('Error fetching user from database:', error);
+//     throw error;
+//   }
+// }
 // authenticateUser,
 // Example of API endpoint to calculate mass and print time
 MiddleWareapp.post("/calculate", authenticateUser, (req, res) => {
@@ -122,22 +122,22 @@ MiddleWareapp.get("/calculate-function", authenticateUser, (req, res) => {
   });
 });
 
-const fetchConfigSettings = async (userUIDInLocalStorage) => {
+// const fetchConfigSettings = async (userUIDInLocalStorage) => {
   
-  try {
-    const configDocRef = doc(ConfigCollection, userUIDInLocalStorage); // Replace with your collection and document IDs
-    const configDocSnapshot = await getDoc(configDocRef);
+//   try {
+//     const configDocRef = doc(ConfigCollection, userUIDInLocalStorage); // Replace with your collection and document IDs
+//     const configDocSnapshot = await getDoc(configDocRef);
 
-    if (configDocSnapshot.exists()) {
-      const data = configDocSnapshot.data();
-      console.log(data)
-    }
-    // console.log(materialSettings);
-  } catch (error) {
-    console.error("Error fetching configuration settings:", error);
-  }
+//     if (configDocSnapshot.exists()) {
+//       const data = configDocSnapshot.data();
+//       console.log(data)
+//     }
+//     // console.log(materialSettings);
+//   } catch (error) {
+//     console.error("Error fetching configuration settings:", error);
+//   }
 
-};
+// };
 MiddleWareapp.post("/validate-price", (req, res) => {
   const items = req.body;
   // console.log(items)
@@ -304,28 +304,28 @@ MiddleWareapp.get("/validate-email", async (req, res) => {
 });
 
 // Route to update user email
-MiddleWareapp.post('/update-email', async (req, res) => {
-  const { userId, newEmail } = req.body;
+// MiddleWareapp.post('/update-email', async (req, res) => {
+//   const { userId, newEmail } = req.body;
 
-  try {
+//   try {
    
-      // Fetch user data from your database (e.g., Firestore)
-      const userData = await getUserFromDatabase(userId);
-      console.log(userData);
-      // Check if the new email is valid and verified
-      if (userData.email === newEmail && userData.isEmailVerified) {
-        // Update the user's email in Firebase Auth
-        await updateEmail(user, newEmail);
+//       // Fetch user data from your database (e.g., Firestore)
+//       const userData = await getUserFromDatabase(userId);
+//       console.log(userData);
+//       // Check if the new email is valid and verified
+//       if (userData.email === newEmail && userData.isEmailVerified) {
+//         // Update the user's email in Firebase Auth
+//         await updateEmail(user, newEmail);
 
-        res.status(200).json({ message: 'Email updated successfully' });
-      } else {
-        res.status(400).json({ error: 'Invalid email or email not verified' });
-      }
-  } catch (error) {
-    console.error('Error updating email:', error);
-    res.status(500).json({ error: 'An error occurred while updating email' });
-  }
-});
+//         res.status(200).json({ message: 'Email updated successfully' });
+//       } else {
+//         res.status(400).json({ error: 'Invalid email or email not verified' });
+//       }
+//   } catch (error) {
+//     console.error('Error updating email:', error);
+//     res.status(500).json({ error: 'An error occurred while updating email' });
+//   }
+// });
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
 // middleware.js
 MiddleWareapp.get("/get-stripe-key", (req, res) => {
