@@ -278,8 +278,8 @@ MiddleWareapp.post(
         success_url: `https://slicerlabs.netlify.app/success?user_id=${userUID}`,
         cancel_url: `https://slicerlabs.netlify.app/cart?returning_user_id=${userUID}`,
       });
-      res.redirect(session.url)
-      // res.status(200).json({ url: session.url });
+      // res.redirect(session.url)
+      res.status(200).json({ url: session.url });
 
       // return res.json(session);
     } catch (error) {
