@@ -299,7 +299,7 @@ MiddleWareapp.post(
       const session = await stripe.checkout.sessions.create({
         line_items: lineItems,
         mode: "payment",
-        success_url: `/Success?user_id=${userUID}`,
+        success_url: `https://slicerlabs.netlify.app/success?user_id=${userUID}`,
         cancel_url: `https://slicerlabs.netlify.app/cart?returning_user_id=${userUID}`,
       });
       // res.redirect(session.url)
