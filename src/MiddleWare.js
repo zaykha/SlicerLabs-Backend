@@ -17,10 +17,28 @@ const corsHeader = {
   "Access-Control-Allow-Headers": "Content-Type, Authorization",
 };
 // const auth = getAuth();
-const firebaseAdminSdkCredentials =  JSON.parse(process.env.FIREBASE_ADMIN_SDK_CREDENTIALS);
+const firebaseAdminSdkCredentials = JSON.parse(
+  process.env.FIREBASE_ADMIN_SDK_CREDENTIALS
+);
 // console.log(firebaseAdminSdkCredentials)
 admin.initializeApp({
   credential: admin.credential.cert(firebaseAdminSdkCredentials),
+  // credential: admin.credential.cert({
+  //   type: "service_account",
+  //   project_id: "slicerlabs-c10ea",
+  //   private_key_id: "aec1952b84a8d57638f5de1adc3e90a169493251",
+  //   private_key:
+  //     "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCrc5pTRgfPa+u6\n9yJCwurfl7YAfQ0CdJQbpu+qzVsOKQouWkZ3bKR8Nzo1K5gQmgX3Axk/QE+NKpL8\nAX7IkCmmDP/S74pT0p8LyDAChwXYHH5JV7vCcmne4Yly9q1ZbYapTz9A8HwL+rrh\nVjE2yeJlbzsAAJ21PxL1R0zNSo7cS/EWxuESw5ZPTmNY0F8b9lM5lCaSA2uMpm7q\nJUQwklgYigSuSEIMT1pQw43EwotdLTvS9B2ffNT617B/NCSUrcgBOSZQxGSQZhDi\nGqxZkR1khBSWwxvOOqbvRNMhJT4MWyxIary09B3IaAcbTOzMpOb4pgGXx7cPHh0E\nX76x21L9AgMBAAECggEAKDxU9z30D0VwaMweijRcEmT0HWE7cFwTdfnTPO48dDJF\nZWNiLhyc7Vm4m0nDwgGjbLiZcDKTeLmJDQL80eyjGYjrcIEuoUVIdedg/Pba9ECb\nknK4aYWYOuoK66PgQqBlfc5PNdo6AkWxHbiwi/8M1mkoG3QJjsNim5VD/NmGdUQq\nyjYgfGm7GKJrvXHOImegntvlxMI1FypAIVSGqEsPBxdcZjv47rhYFt5B2EzaQHQk\n+i0M/BgQQfpn/3sV7CePaVcLBHGhsXN+KGYxZgoyQdcQlOnUiTSkgI6YegSWDcBd\nT7G/SU3+w6svGo7fAROHE96GQlKO6hy+ZWA7P0ZfMQKBgQDYQdbj/mdO3oew8kQt\npoooH1Yz6cOZnj5GGjgMmsdzYpEMhUCI1f6UA/49jaVlBoii+PRuOFhRFyKJxRGu\nQbOCZ21myuMG8WdTXdoZ8sDJbsqoHUcENtNeBuw0XTtwS0aHmc4sWoyNxNqTD6ST\n1d5+7CgLa7KSms4xHh1JLsFlNwKBgQDK9dANSGOcbH1i1vm5aVecg24CF8VqT1u4\nf6/UojblvYXcb7tewHKd9y0qjhbIPTxxMqZIQGAqPSWSbA0zKFd9tnN1B00OeQZW\nQLv7MdKnQDSObkJX22228b+8QAAsZFxunj+inKFaUp38TkVzQ5DwrlI/7cAIWK/r\n3TpCYwyjawKBgHvHG3890tWiqxnNYNacNwGGBioKh8k6eLxZL3GPec+CQDFhZ7Gq\ngl8n9fI3S86KMdTOF+GqYGpxinQ+lsMdmehu2IB4af9EVvaxhi9J8ayZvGcC8u3n\nj42G+tVx855vh3v/vbFHVqGiZdS8pF91jzcoZjc7OmeNMa2NZgfIOit7AoGBALPy\ngcZlGjxETF9n7v2fEpioRs8AOH5rYg0Q2NqUAExtXtP1FJGL25OG5brHRBfBg2dx\n2tBQk3KfyEIsHv/ukrPZIkDuejmMwDuVJZYvtG+pk298/sFawcnkSXUk4YJ6cSF6\nmT0Z1k141q4uz5DEpStfw3j+2LYNu9xJxy+5FimFAoGANTiR7wBkCfx7VqJtWqGJ\njb0mSPgVH3kHmVUL/e8x5mVHuyly9koZfV2mGx/8aEibn0wSysX5usA6GIr7MrKT\nzut1CqebzwWfMqDZSeWIkyVB4gzEF1CddmId53fSSwy4HJ3g6w1klOF3he+/dAeg\nKdpQIeH4//oCHVIL/DA4OTI=\n-----END PRIVATE KEY-----\n",
+  //   client_email:
+  //     "firebase-adminsdk-b7iak@slicerlabs-c10ea.iam.gserviceaccount.com",
+  //   client_id: "114841800848696886048",
+  //   auth_uri: "https://accounts.google.com/o/oauth2/auth",
+  //   token_uri: "https://oauth2.googleapis.com/token",
+  //   auth_provider_x509_cert_url: "https://www.googleapis.com/oauth2/v1/certs",
+  //   client_x509_cert_url:
+  //     "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-b7iak%40slicerlabs-c10ea.iam.gserviceaccount.com",
+  //   universe_domain: "googleapis.com",
+  // }),
   databaseURL:
     "https://slicerlabs-c10ea-default-rtdb.asia-southeast1.firebasedatabase.app",
 });
@@ -125,7 +143,7 @@ MiddleWareapp.get("/calculate-function", authenticateUser, (req, res) => {
 });
 
 // const fetchConfigSettings = async (userUIDInLocalStorage) => {
-  
+
 //   try {
 //     const configDocRef = doc(ConfigCollection, userUIDInLocalStorage); // Replace with your collection and document IDs
 //     const configDocSnapshot = await getDoc(configDocRef);
@@ -149,15 +167,21 @@ MiddleWareapp.post("/validate-price", (req, res) => {
   // fetchConfigSettings(items[0].itemId)
   let isValid = true;
   items.forEach((item) => {
-    const { material, color, dimensions, quantity, price, materialSettings } = item;
-    const actualPrice = calculatePrice(material, color, dimensions, materialSettings);
+    const { material, color, dimensions, quantity, price, materialSettings } =
+      item;
+    const actualPrice = calculatePrice(
+      material,
+      color,
+      dimensions,
+      materialSettings
+    );
     const totalPrice = actualPrice * quantity;
     // console.log(actualPrice, totalPrice, price, quantity);
-    if (totalPrice !== price*quantity) {
+    if (totalPrice !== price * quantity) {
       isValid = false;
     }
   });
-  
+
   if (isValid) {
     res.json({ valid: true });
   } else {
@@ -246,9 +270,9 @@ MiddleWareapp.post(
   // authenticateUser,
   async (req, res) => {
     const items = req.body;
-    
+
     const userUID = items[0].userUID;
-    console.log(items,userUID);
+    console.log(items, userUID);
     // Create a line_items array for the Stripe checkout session
     const lineItems = items.map((item) => {
       const { material, color, dimensions, price, itemId, quantity } = item;
@@ -275,7 +299,7 @@ MiddleWareapp.post(
       const session = await stripe.checkout.sessions.create({
         line_items: lineItems,
         mode: "payment",
-        success_url: `https://slicerlabs.netlify.app/StripePaymentSuccess?user_id=${userUID}`,
+        success_url: `/Success?user_id=${userUID}`,
         cancel_url: `https://slicerlabs.netlify.app/cart?returning_user_id=${userUID}`,
       });
       // res.redirect(session.url)
@@ -291,9 +315,11 @@ MiddleWareapp.post(
 );
 MiddleWareapp.get("/validate-email", async (req, res) => {
   const { email } = req.query;
- 
+
   const token = "80fbc8ce7e0f482d9f5f36e50cb11389";
-  const apiUrl = `https://api.ValidEmail.net/?email=${encodeURIComponent(email)}&token=${token}`;
+  const apiUrl = `https://api.ValidEmail.net/?email=${encodeURIComponent(
+    email
+  )}&token=${token}`;
 
   try {
     const response = await fetch(apiUrl);
@@ -310,7 +336,7 @@ MiddleWareapp.get("/validate-email", async (req, res) => {
 //   const { userId, newEmail } = req.body;
 
 //   try {
-   
+
 //       // Fetch user data from your database (e.g., Firestore)
 //       const userData = await getUserFromDatabase(userId);
 //       console.log(userData);
