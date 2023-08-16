@@ -10,6 +10,7 @@ const allowedOrigins = [
   "https://slicerlabs.netlify.app",
   "https://checkout.stripe.com",
   "http://192.168.1.5:5173",
+  "http://127.0.0.1:5173"
 ];
 app.use(
   cors({
