@@ -2,13 +2,9 @@
 import express from "express";
 import admin from "firebase-admin";
 import calculatePrice from "./CalculatePrice.js";
-// import serviceAccount from "../secrets/slicerlabs-c10ea-firebase-adminsdk-b7iak-aec1952b84.mjs";
 import stripe from "./stripconfig.js";
 import fetch from "node-fetch";
-// import { getAuth, updateEmail } from "firebase/auth";
-// import { collection, doc, getDoc } from "firebase/firestore";
-// import { ConfigCollection, auth, db } from "../firebaseconfig.js";
-
+import {firebaseAdminSDK} from "../secrets/slicerlabs-c10ea-firebase-adminsdk-b7iak-aec1952b84.mjs";
 const MiddleWareapp = express();
 
 const corsHeader = {
@@ -17,28 +13,29 @@ const corsHeader = {
   "Access-Control-Allow-Headers": "Content-Type, Authorization",
 };
 // const auth = getAuth();
-const firebaseAdminSdkCredentials = JSON.parse(
-  process.env.FIREBASE_ADMIN_SDK_CREDENTIALS
-);
+// const firebaseAdminSdkCredentials = JSON.parse(
+//   process.env.FIREBASE_ADMIN_SDK_CREDENTIALS
+// );
+
 // console.log(firebaseAdminSdkCredentials)
 admin.initializeApp({
-  credential: admin.credential.cert(firebaseAdminSdkCredentials),
-  // credential: admin.credential.cert({
-  //   type: "service_account",
-  //   project_id: "slicerlabs-c10ea",
-  //   private_key_id: "aec1952b84a8d57638f5de1adc3e90a169493251",
-  //   private_key:
-  //     "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCrc5pTRgfPa+u6\n9yJCwurfl7YAfQ0CdJQbpu+qzVsOKQouWkZ3bKR8Nzo1K5gQmgX3Axk/QE+NKpL8\nAX7IkCmmDP/S74pT0p8LyDAChwXYHH5JV7vCcmne4Yly9q1ZbYapTz9A8HwL+rrh\nVjE2yeJlbzsAAJ21PxL1R0zNSo7cS/EWxuESw5ZPTmNY0F8b9lM5lCaSA2uMpm7q\nJUQwklgYigSuSEIMT1pQw43EwotdLTvS9B2ffNT617B/NCSUrcgBOSZQxGSQZhDi\nGqxZkR1khBSWwxvOOqbvRNMhJT4MWyxIary09B3IaAcbTOzMpOb4pgGXx7cPHh0E\nX76x21L9AgMBAAECggEAKDxU9z30D0VwaMweijRcEmT0HWE7cFwTdfnTPO48dDJF\nZWNiLhyc7Vm4m0nDwgGjbLiZcDKTeLmJDQL80eyjGYjrcIEuoUVIdedg/Pba9ECb\nknK4aYWYOuoK66PgQqBlfc5PNdo6AkWxHbiwi/8M1mkoG3QJjsNim5VD/NmGdUQq\nyjYgfGm7GKJrvXHOImegntvlxMI1FypAIVSGqEsPBxdcZjv47rhYFt5B2EzaQHQk\n+i0M/BgQQfpn/3sV7CePaVcLBHGhsXN+KGYxZgoyQdcQlOnUiTSkgI6YegSWDcBd\nT7G/SU3+w6svGo7fAROHE96GQlKO6hy+ZWA7P0ZfMQKBgQDYQdbj/mdO3oew8kQt\npoooH1Yz6cOZnj5GGjgMmsdzYpEMhUCI1f6UA/49jaVlBoii+PRuOFhRFyKJxRGu\nQbOCZ21myuMG8WdTXdoZ8sDJbsqoHUcENtNeBuw0XTtwS0aHmc4sWoyNxNqTD6ST\n1d5+7CgLa7KSms4xHh1JLsFlNwKBgQDK9dANSGOcbH1i1vm5aVecg24CF8VqT1u4\nf6/UojblvYXcb7tewHKd9y0qjhbIPTxxMqZIQGAqPSWSbA0zKFd9tnN1B00OeQZW\nQLv7MdKnQDSObkJX22228b+8QAAsZFxunj+inKFaUp38TkVzQ5DwrlI/7cAIWK/r\n3TpCYwyjawKBgHvHG3890tWiqxnNYNacNwGGBioKh8k6eLxZL3GPec+CQDFhZ7Gq\ngl8n9fI3S86KMdTOF+GqYGpxinQ+lsMdmehu2IB4af9EVvaxhi9J8ayZvGcC8u3n\nj42G+tVx855vh3v/vbFHVqGiZdS8pF91jzcoZjc7OmeNMa2NZgfIOit7AoGBALPy\ngcZlGjxETF9n7v2fEpioRs8AOH5rYg0Q2NqUAExtXtP1FJGL25OG5brHRBfBg2dx\n2tBQk3KfyEIsHv/ukrPZIkDuejmMwDuVJZYvtG+pk298/sFawcnkSXUk4YJ6cSF6\nmT0Z1k141q4uz5DEpStfw3j+2LYNu9xJxy+5FimFAoGANTiR7wBkCfx7VqJtWqGJ\njb0mSPgVH3kHmVUL/e8x5mVHuyly9koZfV2mGx/8aEibn0wSysX5usA6GIr7MrKT\nzut1CqebzwWfMqDZSeWIkyVB4gzEF1CddmId53fSSwy4HJ3g6w1klOF3he+/dAeg\nKdpQIeH4//oCHVIL/DA4OTI=\n-----END PRIVATE KEY-----\n",
-  //   client_email:
-  //     "firebase-adminsdk-b7iak@slicerlabs-c10ea.iam.gserviceaccount.com",
-  //   client_id: "114841800848696886048",
-  //   auth_uri: "https://accounts.google.com/o/oauth2/auth",
-  //   token_uri: "https://oauth2.googleapis.com/token",
-  //   auth_provider_x509_cert_url: "https://www.googleapis.com/oauth2/v1/certs",
-  //   client_x509_cert_url:
-  //     "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-b7iak%40slicerlabs-c10ea.iam.gserviceaccount.com",
-  //   universe_domain: "googleapis.com",
-  // }),
+  // credential: admin.credential.cert(firebaseAdminSDK),
+   credential: admin.credential.cert({
+    type: "service_account",
+    project_id: "slicerlabs-c10ea",
+    private_key_id: "aec1952b84a8d57638f5de1adc3e90a169493251",
+    private_key:
+      "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCrc5pTRgfPa+u6\n9yJCwurfl7YAfQ0CdJQbpu+qzVsOKQouWkZ3bKR8Nzo1K5gQmgX3Axk/QE+NKpL8\nAX7IkCmmDP/S74pT0p8LyDAChwXYHH5JV7vCcmne4Yly9q1ZbYapTz9A8HwL+rrh\nVjE2yeJlbzsAAJ21PxL1R0zNSo7cS/EWxuESw5ZPTmNY0F8b9lM5lCaSA2uMpm7q\nJUQwklgYigSuSEIMT1pQw43EwotdLTvS9B2ffNT617B/NCSUrcgBOSZQxGSQZhDi\nGqxZkR1khBSWwxvOOqbvRNMhJT4MWyxIary09B3IaAcbTOzMpOb4pgGXx7cPHh0E\nX76x21L9AgMBAAECggEAKDxU9z30D0VwaMweijRcEmT0HWE7cFwTdfnTPO48dDJF\nZWNiLhyc7Vm4m0nDwgGjbLiZcDKTeLmJDQL80eyjGYjrcIEuoUVIdedg/Pba9ECb\nknK4aYWYOuoK66PgQqBlfc5PNdo6AkWxHbiwi/8M1mkoG3QJjsNim5VD/NmGdUQq\nyjYgfGm7GKJrvXHOImegntvlxMI1FypAIVSGqEsPBxdcZjv47rhYFt5B2EzaQHQk\n+i0M/BgQQfpn/3sV7CePaVcLBHGhsXN+KGYxZgoyQdcQlOnUiTSkgI6YegSWDcBd\nT7G/SU3+w6svGo7fAROHE96GQlKO6hy+ZWA7P0ZfMQKBgQDYQdbj/mdO3oew8kQt\npoooH1Yz6cOZnj5GGjgMmsdzYpEMhUCI1f6UA/49jaVlBoii+PRuOFhRFyKJxRGu\nQbOCZ21myuMG8WdTXdoZ8sDJbsqoHUcENtNeBuw0XTtwS0aHmc4sWoyNxNqTD6ST\n1d5+7CgLa7KSms4xHh1JLsFlNwKBgQDK9dANSGOcbH1i1vm5aVecg24CF8VqT1u4\nf6/UojblvYXcb7tewHKd9y0qjhbIPTxxMqZIQGAqPSWSbA0zKFd9tnN1B00OeQZW\nQLv7MdKnQDSObkJX22228b+8QAAsZFxunj+inKFaUp38TkVzQ5DwrlI/7cAIWK/r\n3TpCYwyjawKBgHvHG3890tWiqxnNYNacNwGGBioKh8k6eLxZL3GPec+CQDFhZ7Gq\ngl8n9fI3S86KMdTOF+GqYGpxinQ+lsMdmehu2IB4af9EVvaxhi9J8ayZvGcC8u3n\nj42G+tVx855vh3v/vbFHVqGiZdS8pF91jzcoZjc7OmeNMa2NZgfIOit7AoGBALPy\ngcZlGjxETF9n7v2fEpioRs8AOH5rYg0Q2NqUAExtXtP1FJGL25OG5brHRBfBg2dx\n2tBQk3KfyEIsHv/ukrPZIkDuejmMwDuVJZYvtG+pk298/sFawcnkSXUk4YJ6cSF6\nmT0Z1k141q4uz5DEpStfw3j+2LYNu9xJxy+5FimFAoGANTiR7wBkCfx7VqJtWqGJ\njb0mSPgVH3kHmVUL/e8x5mVHuyly9koZfV2mGx/8aEibn0wSysX5usA6GIr7MrKT\nzut1CqebzwWfMqDZSeWIkyVB4gzEF1CddmId53fSSwy4HJ3g6w1klOF3he+/dAeg\nKdpQIeH4//oCHVIL/DA4OTI=\n-----END PRIVATE KEY-----\n",
+    client_email:
+      "firebase-adminsdk-b7iak@slicerlabs-c10ea.iam.gserviceaccount.com",
+    client_id: "114841800848696886048",
+    auth_uri: "https://accounts.google.com/o/oauth2/auth",
+    token_uri: "https://oauth2.googleapis.com/token",
+    auth_provider_x509_cert_url: "https://www.googleapis.com/oauth2/v1/certs",
+    client_x509_cert_url:
+      "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-b7iak%40slicerlabs-c10ea.iam.gserviceaccount.com",
+    universe_domain: "googleapis.com",
+  }),
   databaseURL:
     "https://slicerlabs-c10ea-default-rtdb.asia-southeast1.firebasedatabase.app",
 });
@@ -62,12 +59,9 @@ const authenticateUser = (req, res, next) => {
       return res.status(401).json({ message: "Invalid token" });
     });
 };
-
+//not Active
 const isValidPromoCode = (promoCode) => {
-  // Here, you can query your database or Firebase to check if the promo code exists and is valid.
-  // You may also want to check if the promo code has not expired.
 
-  // For example, assuming you have promo codes stored in an array or database:
   const validPromoCodes = [
     { code: "SUMMER2023", discountPercentage: 10, validUntil: "2023-08-31" },
     // Add more valid promo codes here
@@ -86,24 +80,7 @@ const isValidPromoCode = (promoCode) => {
   // Return false if the promo code is not valid
   return false;
 };
-// async function getUserFromDatabase(userId) {
-//   try {
-//     // Fetch user document from Firestore
-//     const userDoc = await getDoc(doc(collection(db, 'users'), userId));
 
-//     if (userDoc.exists()) {
-//       // Return user data from the document
-//       return userDoc.data();
-//     } else {
-//       throw new Error('User not found');
-//     }
-//   } catch (error) {
-//     console.error('Error fetching user from database:', error);
-//     throw error;
-//   }
-// }
-// authenticateUser,
-// Example of API endpoint to calculate mass and print time
 MiddleWareapp.post("/calculate", authenticateUser, (req, res) => {
   const { material, color, dimensions } = req.body;
 
@@ -142,22 +119,6 @@ MiddleWareapp.get("/calculate-function", authenticateUser, (req, res) => {
   });
 });
 
-// const fetchConfigSettings = async (userUIDInLocalStorage) => {
-
-//   try {
-//     const configDocRef = doc(ConfigCollection, userUIDInLocalStorage); // Replace with your collection and document IDs
-//     const configDocSnapshot = await getDoc(configDocRef);
-
-//     if (configDocSnapshot.exists()) {
-//       const data = configDocSnapshot.data();
-//       console.log(data)
-//     }
-//     // console.log(materialSettings);
-//   } catch (error) {
-//     console.error("Error fetching configuration settings:", error);
-//   }
-
-// };
 MiddleWareapp.post("/validate-price", (req, res) => {
   const items = req.body;
   // console.log(items)
@@ -197,7 +158,7 @@ MiddleWareapp.post("/calculate-shipping", authenticateUser, (req, res) => {
     return res.status(400).json({ error: "Missing required field" });
   }
 
-  // Implement your shipping cost calculation logic based on the selected shipping option
+
   let shippingCost = 0;
   if (shippingOption === "NML") {
     shippingCost = 10; // Example shipping cost for ABS express shipping
@@ -218,9 +179,6 @@ MiddleWareapp.post("/apply-promo", authenticateUser, (req, res) => {
   if (!promoCode) {
     return res.status(400).json({ error: "Missing required field" });
   }
-
-  // Implement your promo code handling logic here
-  // You can check if the promo code is valid and calculate the discount accordingly
 
   // For example, let's assume promo code "SUMMER10" gives a 10% discount
   if (promoCode === "SUMMER10") {
@@ -250,11 +208,11 @@ MiddleWareapp.post("/apply-promo-code", authenticateUser, (req, res) => {
   const discountPercentage = isValidPromoCode(promoCode);
 
   if (discountPercentage !== false) {
-    // If the promo code is valid, you can calculate the discounted amount and return it as the response
+    // If the promo code is valid, can calculate the discounted amount and return it as the response
     // For example, if the order total is $100, and the discountPercentage is 10 (10%),
     // then the discounted amount will be $100 * 0.1 = $10, and the final amount will be $100 - $10 = $90.
 
-    // Apply your calculation logic here and return the discounted amount
+    // Apply calculation logic here and return the discounted amount
     const orderTotal = 100; // Replace this with the actual order total
     const discountedAmount = orderTotal * (discountPercentage / 100);
     const finalAmount = orderTotal - discountedAmount;
@@ -313,6 +271,7 @@ MiddleWareapp.post(
     }
   }
 );
+
 MiddleWareapp.get("/validate-email", async (req, res) => {
   const { email } = req.query;
 
@@ -331,29 +290,6 @@ MiddleWareapp.get("/validate-email", async (req, res) => {
   }
 });
 
-// Route to update user email
-// MiddleWareapp.post('/update-email', async (req, res) => {
-//   const { userId, newEmail } = req.body;
-
-//   try {
-
-//       // Fetch user data from your database (e.g., Firestore)
-//       const userData = await getUserFromDatabase(userId);
-//       console.log(userData);
-//       // Check if the new email is valid and verified
-//       if (userData.email === newEmail && userData.isEmailVerified) {
-//         // Update the user's email in Firebase Auth
-//         await updateEmail(user, newEmail);
-
-//         res.status(200).json({ message: 'Email updated successfully' });
-//       } else {
-//         res.status(400).json({ error: 'Invalid email or email not verified' });
-//       }
-//   } catch (error) {
-//     console.error('Error updating email:', error);
-//     res.status(500).json({ error: 'An error occurred while updating email' });
-//   }
-// });
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
 // middleware.js
 MiddleWareapp.get("/get-stripe-key", (req, res) => {

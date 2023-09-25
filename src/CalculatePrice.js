@@ -9,22 +9,22 @@ export default function calculatePrice(
   // Define the density values for different materials
   // console.log("material settings in calculate Price ", materialSettings);
   const densityValues = {
-    ABS: 1.04, // g/cm^3
-    PLA: 1.25, // g/cm^3
-    TPU: 1.21, // g/cm^3
-    NYLON: 1.14, // g/cm^3
-    PETG: 1.27, // g/cm^3
-    RESIN: 1.05, // g/cm^3
+    ABS: 0.00104, // g/mm^3 (converted from g/cm^3)
+    PLA: 0.00125, // g/mm^3 (converted from g/cm^3)
+    TPU: 0.00121, // g/mm^3 (converted from g/cm^3)
+    NYLON: 0.00114, // g/mm^3 (converted from g/cm^3)
+    PETG: 0.00127, // g/mm^3 (converted from g/cm^3)
+    RESIN: 0.00105, // g/mm^3 (converted from g/cm^3)
   };
-
-  // Define the print time per unit volume for different materials (in minutes)
+  
+  // Define the print time per unit volume for different materials (in minutes/mm^3)
   const defaultPrintTimePerUnitVolume = {
-    ABS: 0.05, // minutes/cm^3
-    PLA: 0.04, // minutes/cm^3
-    TPU: 0.06, // minutes/cm^3
-    NYLON: 0.07, // minutes/cm^3
-    PETG: 0.05, // minutes/cm^3
-    RESIN: 0.03, // minutes/cm^3
+    ABS: 0.05, // minutes/mm^3
+    PLA: 0.04, // minutes/mm^3
+    TPU: 0.06, // minutes/mm^3
+    NYLON: 0.07, // minutes/mm^3
+    PETG: 0.05, // minutes/mm^3
+    RESIN: 0.03, // minutes/mm^3
   };
 
   const printTimePerUnitVolume = materialSettings
@@ -54,16 +54,8 @@ export default function calculatePrice(
   // Define any additional overhead costs per print or per hour
   const overheadCost = materialSettings ? materialSettings.overheadCost : 5; // SGD per print or per hour
 
-  // console.log(
-  //   "actual consts in calculate function ",
-  //   printTimePerUnitVolume,
-  //   materialCosts,
-  //   hourlyRate,
-  //   laborCost,
-  //   overheadCost
-  // );
   // Calculate mass and print time using the calculateMassAndPrintTime function
-  const volume = dimensions.width * dimensions.height * dimensions.depth || 0; // cm^3
+  const volume = (dimensions.width * dimensions.height * dimensions.depth) / 1000 || 0; // cm^3
   const density = densityValues[material] || 0; // g/cm^3
   const mass = volume * density; // grams
   const printTime = volume * printTimePerUnitVolume[material] || 0; // minutes
