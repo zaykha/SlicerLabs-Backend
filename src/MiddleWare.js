@@ -4,7 +4,7 @@ import admin from "firebase-admin";
 import calculatePrice from "./CalculatePrice.js";
 import stripe from "./stripconfig.js";
 import fetch from "node-fetch";
-import {firebaseAdminSDK} from "../secrets/slicerlabs-c10ea-firebase-adminsdk-b7iak-aec1952b84.mjs";
+// import {firebaseAdminSDK} from "../secrets/slicerlabs-c10ea-firebase-adminsdk-b7iak-aec1952b84.mjs";
 const MiddleWareapp = express();
 
 const corsHeader = {
