@@ -4,6 +4,9 @@ import admin from "firebase-admin";
 import calculatePrice from "./CalculatePrice.js";
 import stripe from "./stripconfig.js";
 import fetch from "node-fetch";
+import nodemailer from 'nodemailer';
+import fs from 'fs/promises';
+import { promises as fsPromises } from 'fs';
 // import {firebaseAdminSDK} from "../secrets/slicerlabs-c10ea-firebase-adminsdk-b7iak-aec1952b84.mjs";
 const MiddleWareapp = express();
 
@@ -13,31 +16,31 @@ const corsHeader = {
   "Access-Control-Allow-Headers": "Content-Type, Authorization",
 };
 // const auth = getAuth();
-const firebaseAdminSdkCredentials = JSON.parse(
-  process.env.FIREBASE_ADMIN_SDK_CREDENTIALS
-);
+// const firebaseAdminSdkCredentials = JSON.parse(
+//   process.env.FIREBASE_ADMIN_SDK_CREDENTIALS
+// );
 
 // console.log(firebaseAdminSdkCredentials)
 admin.initializeApp({
-  credential: admin.credential.cert(firebaseAdminSdkCredentials),
-  //  credential: admin.credential.cert({
-  //   type: "service_account",
-  //   project_id: "slicerlabs-c10ea",
-  //   private_key_id: "aec1952b84a8d57638f5de1adc3e90a169493251",
-  //   private_key:
-  //     "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCrc5pTRgfPa+u6\n9yJCwurfl7YAfQ0CdJQbpu+qzVsOKQouWkZ3bKR8Nzo1K5gQmgX3Axk/QE+NKpL8\nAX7IkCmmDP/S74pT0p8LyDAChwXYHH5JV7vCcmne4Yly9q1ZbYapTz9A8HwL+rrh\nVjE2yeJlbzsAAJ21PxL1R0zNSo7cS/EWxuESw5ZPTmNY0F8b9lM5lCaSA2uMpm7q\nJUQwklgYigSuSEIMT1pQw43EwotdLTvS9B2ffNT617B/NCSUrcgBOSZQxGSQZhDi\nGqxZkR1khBSWwxvOOqbvRNMhJT4MWyxIary09B3IaAcbTOzMpOb4pgGXx7cPHh0E\nX76x21L9AgMBAAECggEAKDxU9z30D0VwaMweijRcEmT0HWE7cFwTdfnTPO48dDJF\nZWNiLhyc7Vm4m0nDwgGjbLiZcDKTeLmJDQL80eyjGYjrcIEuoUVIdedg/Pba9ECb\nknK4aYWYOuoK66PgQqBlfc5PNdo6AkWxHbiwi/8M1mkoG3QJjsNim5VD/NmGdUQq\nyjYgfGm7GKJrvXHOImegntvlxMI1FypAIVSGqEsPBxdcZjv47rhYFt5B2EzaQHQk\n+i0M/BgQQfpn/3sV7CePaVcLBHGhsXN+KGYxZgoyQdcQlOnUiTSkgI6YegSWDcBd\nT7G/SU3+w6svGo7fAROHE96GQlKO6hy+ZWA7P0ZfMQKBgQDYQdbj/mdO3oew8kQt\npoooH1Yz6cOZnj5GGjgMmsdzYpEMhUCI1f6UA/49jaVlBoii+PRuOFhRFyKJxRGu\nQbOCZ21myuMG8WdTXdoZ8sDJbsqoHUcENtNeBuw0XTtwS0aHmc4sWoyNxNqTD6ST\n1d5+7CgLa7KSms4xHh1JLsFlNwKBgQDK9dANSGOcbH1i1vm5aVecg24CF8VqT1u4\nf6/UojblvYXcb7tewHKd9y0qjhbIPTxxMqZIQGAqPSWSbA0zKFd9tnN1B00OeQZW\nQLv7MdKnQDSObkJX22228b+8QAAsZFxunj+inKFaUp38TkVzQ5DwrlI/7cAIWK/r\n3TpCYwyjawKBgHvHG3890tWiqxnNYNacNwGGBioKh8k6eLxZL3GPec+CQDFhZ7Gq\ngl8n9fI3S86KMdTOF+GqYGpxinQ+lsMdmehu2IB4af9EVvaxhi9J8ayZvGcC8u3n\nj42G+tVx855vh3v/vbFHVqGiZdS8pF91jzcoZjc7OmeNMa2NZgfIOit7AoGBALPy\ngcZlGjxETF9n7v2fEpioRs8AOH5rYg0Q2NqUAExtXtP1FJGL25OG5brHRBfBg2dx\n2tBQk3KfyEIsHv/ukrPZIkDuejmMwDuVJZYvtG+pk298/sFawcnkSXUk4YJ6cSF6\nmT0Z1k141q4uz5DEpStfw3j+2LYNu9xJxy+5FimFAoGANTiR7wBkCfx7VqJtWqGJ\njb0mSPgVH3kHmVUL/e8x5mVHuyly9koZfV2mGx/8aEibn0wSysX5usA6GIr7MrKT\nzut1CqebzwWfMqDZSeWIkyVB4gzEF1CddmId53fSSwy4HJ3g6w1klOF3he+/dAeg\nKdpQIeH4//oCHVIL/DA4OTI=\n-----END PRIVATE KEY-----\n",
-  //   client_email:
-  //     "firebase-adminsdk-b7iak@slicerlabs-c10ea.iam.gserviceaccount.com",
-  //   client_id: "114841800848696886048",
-  //   auth_uri: "https://accounts.google.com/o/oauth2/auth",
-  //   token_uri: "https://oauth2.googleapis.com/token",
-  //   auth_provider_x509_cert_url: "https://www.googleapis.com/oauth2/v1/certs",
-  //   client_x509_cert_url:
-  //     "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-b7iak%40slicerlabs-c10ea.iam.gserviceaccount.com",
-  //   universe_domain: "googleapis.com",
-  // }),
-  // databaseURL:
-  //   "https://slicerlabs-c10ea-default-rtdb.asia-southeast1.firebasedatabase.app",
+  // credential: admin.credential.cert(firebaseAdminSdkCredentials),
+   credential: admin.credential.cert({
+    type: "service_account",
+    project_id: "slicerlabs-c10ea",
+    private_key_id: "aec1952b84a8d57638f5de1adc3e90a169493251",
+    private_key:
+      "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCrc5pTRgfPa+u6\n9yJCwurfl7YAfQ0CdJQbpu+qzVsOKQouWkZ3bKR8Nzo1K5gQmgX3Axk/QE+NKpL8\nAX7IkCmmDP/S74pT0p8LyDAChwXYHH5JV7vCcmne4Yly9q1ZbYapTz9A8HwL+rrh\nVjE2yeJlbzsAAJ21PxL1R0zNSo7cS/EWxuESw5ZPTmNY0F8b9lM5lCaSA2uMpm7q\nJUQwklgYigSuSEIMT1pQw43EwotdLTvS9B2ffNT617B/NCSUrcgBOSZQxGSQZhDi\nGqxZkR1khBSWwxvOOqbvRNMhJT4MWyxIary09B3IaAcbTOzMpOb4pgGXx7cPHh0E\nX76x21L9AgMBAAECggEAKDxU9z30D0VwaMweijRcEmT0HWE7cFwTdfnTPO48dDJF\nZWNiLhyc7Vm4m0nDwgGjbLiZcDKTeLmJDQL80eyjGYjrcIEuoUVIdedg/Pba9ECb\nknK4aYWYOuoK66PgQqBlfc5PNdo6AkWxHbiwi/8M1mkoG3QJjsNim5VD/NmGdUQq\nyjYgfGm7GKJrvXHOImegntvlxMI1FypAIVSGqEsPBxdcZjv47rhYFt5B2EzaQHQk\n+i0M/BgQQfpn/3sV7CePaVcLBHGhsXN+KGYxZgoyQdcQlOnUiTSkgI6YegSWDcBd\nT7G/SU3+w6svGo7fAROHE96GQlKO6hy+ZWA7P0ZfMQKBgQDYQdbj/mdO3oew8kQt\npoooH1Yz6cOZnj5GGjgMmsdzYpEMhUCI1f6UA/49jaVlBoii+PRuOFhRFyKJxRGu\nQbOCZ21myuMG8WdTXdoZ8sDJbsqoHUcENtNeBuw0XTtwS0aHmc4sWoyNxNqTD6ST\n1d5+7CgLa7KSms4xHh1JLsFlNwKBgQDK9dANSGOcbH1i1vm5aVecg24CF8VqT1u4\nf6/UojblvYXcb7tewHKd9y0qjhbIPTxxMqZIQGAqPSWSbA0zKFd9tnN1B00OeQZW\nQLv7MdKnQDSObkJX22228b+8QAAsZFxunj+inKFaUp38TkVzQ5DwrlI/7cAIWK/r\n3TpCYwyjawKBgHvHG3890tWiqxnNYNacNwGGBioKh8k6eLxZL3GPec+CQDFhZ7Gq\ngl8n9fI3S86KMdTOF+GqYGpxinQ+lsMdmehu2IB4af9EVvaxhi9J8ayZvGcC8u3n\nj42G+tVx855vh3v/vbFHVqGiZdS8pF91jzcoZjc7OmeNMa2NZgfIOit7AoGBALPy\ngcZlGjxETF9n7v2fEpioRs8AOH5rYg0Q2NqUAExtXtP1FJGL25OG5brHRBfBg2dx\n2tBQk3KfyEIsHv/ukrPZIkDuejmMwDuVJZYvtG+pk298/sFawcnkSXUk4YJ6cSF6\nmT0Z1k141q4uz5DEpStfw3j+2LYNu9xJxy+5FimFAoGANTiR7wBkCfx7VqJtWqGJ\njb0mSPgVH3kHmVUL/e8x5mVHuyly9koZfV2mGx/8aEibn0wSysX5usA6GIr7MrKT\nzut1CqebzwWfMqDZSeWIkyVB4gzEF1CddmId53fSSwy4HJ3g6w1klOF3he+/dAeg\nKdpQIeH4//oCHVIL/DA4OTI=\n-----END PRIVATE KEY-----\n",
+    client_email:
+      "firebase-adminsdk-b7iak@slicerlabs-c10ea.iam.gserviceaccount.com",
+    client_id: "114841800848696886048",
+    auth_uri: "https://accounts.google.com/o/oauth2/auth",
+    token_uri: "https://oauth2.googleapis.com/token",
+    auth_provider_x509_cert_url: "https://www.googleapis.com/oauth2/v1/certs",
+    client_x509_cert_url:
+      "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-b7iak%40slicerlabs-c10ea.iam.gserviceaccount.com",
+    universe_domain: "googleapis.com",
+  }),
+  databaseURL:
+    "https://slicerlabs-c10ea-default-rtdb.asia-southeast1.firebasedatabase.app",
 });
 
 const authenticateUser = (req, res, next) => {
@@ -222,6 +225,46 @@ MiddleWareapp.post("/apply-promo-code", authenticateUser, (req, res) => {
     res.status(400).json({ error: "Invalid promo code" });
   }
 });
+
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'zaykha@gmail.com',
+    pass: process.env.GMAIL_APP_KEY,
+  },
+});
+
+MiddleWareapp.post('/send-email', async(req, res, next) => {
+  const { to, subject } = req.body;
+  // Read the HTML template file
+  const data = await fsPromises.readFile('purchase_confirmation_template.html', 'utf8');
+  try {
+    // Read the HTML template file using fs.promises.readFile
+    const data = await fsPromises.readFile('purchase_confirmation_template.html', 'utf8');
+
+    // Create the mail options with the HTML template
+    const mailOptions = {
+      from: 'SlicerLabs Team',
+      to,
+      subject,
+      html: data, // Use the contents of the template file as the email body
+    };
+
+    // Send the email
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error('Error sending email:', error);
+        return res.status(500).json({ error: 'Error sending email' });
+      } else {
+        console.log('Email sent:', info.response);
+        next(); // Proceed to the next middleware or route
+      }
+    });
+  } catch (err) {
+    console.error('Error reading template file:', err);
+    return res.status(500).json({ error: 'Error reading email template' });
+  }
+  });
 
 MiddleWareapp.post(
   "/create-checkout-session",

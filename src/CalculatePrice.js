@@ -19,7 +19,7 @@ export default function calculatePrice(
   
   // Define the print time per unit volume for different materials (in minutes/mm^3)
   const defaultPrintTimePerUnitVolume = {
-    ABS: 0.05, // minutes/mm^3
+    ABS: 0.06, // minutes/mm^3
     PLA: 0.04, // minutes/mm^3
     TPU: 0.06, // minutes/mm^3
     NYLON: 0.07, // minutes/mm^3
@@ -33,7 +33,7 @@ export default function calculatePrice(
 
   // Define the base cost per gram for different materials
   const defaultmaterialCosts = {
-    ABS: 0.05, // SGD per gram
+    ABS: 0.06, // SGD per gram
     PLA: 0.04, // SGD per gram
     TPU: 0.06, // SGD per gram
     NYLON: 0.07, // SGD per gram
