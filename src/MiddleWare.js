@@ -115,7 +115,7 @@ MiddleWareapp.post("/calculate", authenticateUser, (req, res) => {
   res.json({ price });
 });
 
-MiddleWareapp.get("/calculate-function", authenticateUser, (req, res) => {
+MiddleWareapp.get("/calculate-function", (req, res) => {
   // Return the entire calculatePrice function as part of the response
   res.json({
     calculatePrice: calculatePrice.toString(),
