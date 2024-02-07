@@ -276,11 +276,11 @@ MiddleWareapp.post(
     console.log(items, userUID);
     // Create a line_items array for the Stripe checkout session
     const lineItems = items.map((item) => {
-      const { material, color, dimensions, price, itemId, quantity } = item;
+      const { material, color, dimensions, pricePerUnit, itemId, quantity } = item;
       return {
         price_data: {
           currency: "sgd",
-          unit_amount: Math.round(price * 100), // Convert price to cents
+          unit_amount: Math.round(pricePerUnit * 100), // Convert price to cents
           product_data: {
             // productId: itemId,
             name: itemId,
