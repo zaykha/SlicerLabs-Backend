@@ -131,7 +131,7 @@ MiddleWareapp.post("/validate-price", (req, res) => {
   // fetchConfigSettings(items[0].itemId)
   let isValid = true;
   items.forEach((item) => {
-    const { material, color, dimensions, quantity, price, materialSettings } =
+    const { material, color, dimensions, quantity, pricePerUnit, materialSettings } =
       item;
     const actualPrice = calculatePrice(
       material,
@@ -141,7 +141,7 @@ MiddleWareapp.post("/validate-price", (req, res) => {
     );
     const totalPrice = actualPrice * quantity;
     // console.log(actualPrice, totalPrice, price, quantity);
-    if (totalPrice !== price * quantity) {
+    if (totalPrice !== pricePerUnit * quantity) {
       isValid = false;
     }
   });
