@@ -326,7 +326,7 @@ MiddleWareapp.post("/send-email", async (req, res, next) => {
 // );
 MiddleWareapp.post(
   "/create-checkout-session",
-  authenticateUser, // Ensure this middleware is properly implemented and secure
+  // authenticateUser, // Ensure this middleware is properly implemented and secure
   async (req, res) => {
     try {
       // Validate and sanitize user input
