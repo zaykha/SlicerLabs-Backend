@@ -4,9 +4,9 @@ import admin from "firebase-admin";
 import calculatePrice from "./CalculatePrice.js";
 import stripe from "./stripconfig.js";
 import fetch from "node-fetch";
-import nodemailer from 'nodemailer';
-import fs from 'fs/promises';
-import { promises as fsPromises } from 'fs';
+import nodemailer from "nodemailer";
+import fs from "fs/promises";
+import { promises as fsPromises } from "fs";
 // import {firebaseAdminSDK} from "../secrets/slicerlabs-c10ea-firebase-adminsdk-b7iak-aec1952b84.mjs";
 const MiddleWareapp = express();
 
@@ -23,7 +23,7 @@ const corsHeader = {
 // console.log(firebaseAdminSdkCredentials)
 admin.initializeApp({
   // credential: admin.credential.cert(firebaseAdminSdkCredentials),
-   credential: admin.credential.cert({
+  credential: admin.credential.cert({
     type: "service_account",
     project_id: "slicerlabs-c10ea",
     private_key_id: "aec1952b84a8d57638f5de1adc3e90a169493251",
@@ -64,7 +64,6 @@ const authenticateUser = (req, res, next) => {
 };
 //not Active
 const isValidPromoCode = (promoCode) => {
-
   const validPromoCodes = [
     { code: "SUMMER2023", discountPercentage: 10, validUntil: "2023-08-31" },
     // Add more valid promo codes here
@@ -131,8 +130,14 @@ MiddleWareapp.post("/validate-price", (req, res) => {
   // fetchConfigSettings(items[0].itemId)
   let isValid = true;
   items.forEach((item) => {
-    const { material, color, dimensions, quantity, pricePerUnit, materialSettings } =
-      item;
+    const {
+      material,
+      color,
+      dimensions,
+      quantity,
+      pricePerUnit,
+      materialSettings,
+    } = item;
     const actualPrice = calculatePrice(
       material,
       color,
@@ -160,7 +165,6 @@ MiddleWareapp.post("/calculate-shipping", authenticateUser, (req, res) => {
   if (!shippingOption) {
     return res.status(400).json({ error: "Missing required field" });
   }
-
 
   let shippingCost = 0;
   if (shippingOption === "NML") {
@@ -227,24 +231,30 @@ MiddleWareapp.post("/apply-promo-code", authenticateUser, (req, res) => {
 });
 
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  service: "gmail",
   auth: {
-    user: 'zaykha@gmail.com',
+    user: "zaykha@gmail.com",
     pass: process.env.GMAIL_APP_KEY,
   },
 });
 
-MiddleWareapp.post('/send-email', async(req, res, next) => {
+MiddleWareapp.post("/send-email", async (req, res, next) => {
   const { to, subject } = req.body;
   // Read the HTML template file
-  const data = await fsPromises.readFile('purchase_confirmation_template.html', 'utf8');
+  const data = await fsPromises.readFile(
+    "purchase_confirmation_template.html",
+    "utf8"
+  );
   try {
     // Read the HTML template file using fs.promises.readFile
-    const data = await fsPromises.readFile('purchase_confirmation_template.html', 'utf8');
+    const data = await fsPromises.readFile(
+      "purchase_confirmation_template.html",
+      "utf8"
+    );
 
     // Create the mail options with the HTML template
     const mailOptions = {
-      from: 'SlicerLabs Team',
+      from: "SlicerLabs Team",
       to,
       subject,
       html: data, // Use the contents of the template file as the email body
@@ -253,60 +263,119 @@ MiddleWareapp.post('/send-email', async(req, res, next) => {
     // Send the email
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
-        console.error('Error sending email:', error);
-        return res.status(500).json({ error: 'Error sending email' });
+        console.error("Error sending email:", error);
+        return res.status(500).json({ error: "Error sending email" });
       } else {
-        console.log('Email sent:', info.response);
+        console.log("Email sent:", info.response);
         next(); // Proceed to the next middleware or route
       }
     });
   } catch (err) {
-    console.error('Error reading template file:', err);
-    return res.status(500).json({ error: 'Error reading email template' });
+    console.error("Error reading template file:", err);
+    return res.status(500).json({ error: "Error reading email template" });
   }
-  });
+});
 
+// MiddleWareapp.post(
+//   "/create-checkout-session",
+//   // authenticateUser,
+//   async (req, res) => {
+//     const items = req.body;
+
+//     const userUID = items[0].userUID;
+//     console.log(items, userUID);
+//     // Create a line_items array for the Stripe checkout session
+//     const lineItems = items.map((item) => {
+//       const { material, color, dimensions, pricePerUnit, itemId, quantity } = item;
+//       return {
+//         price_data: {
+//           currency: "sgd",
+//           unit_amount: Math.round(pricePerUnit * 100), // Convert price to cents
+//           product_data: {
+//             // productId: itemId,
+//             name: itemId,
+//             description: color,
+//             metadata: {
+//               material,
+//               dimensions: JSON.stringify(dimensions),
+//             },
+//             images: [], // You can include image URLs if you have them
+//           },
+//         },
+//         quantity: quantity,
+//       };
+//     });
+
+//     try {
+//       const session = await stripe.checkout.sessions.create({
+//         line_items: lineItems,
+//         mode: "payment",
+//         success_url: `https://slicerlabs.netlify.app/success?success=true&user_id=${userUID}`,
+//         cancel_url: `https://slicerlabs.netlify.app/cart?returning_user_id=${userUID}`,
+//       });
+//       // res.redirect(session.url)
+//       res.status(200).json({ url: session.url });
+
+//       // return res.json(session);
+//     } catch (error) {
+//       // Handle any error that occurred during the creation of the checkout session
+//       console.error("Error creating checkout session:", error);
+//       res.status(500).json({ error: "Failed to create checkout session" });
+//     }
+//   }
+// );
 MiddleWareapp.post(
   "/create-checkout-session",
-  // authenticateUser,
+  authenticateUser, // Ensure this middleware is properly implemented and secure
   async (req, res) => {
-    const items = req.body;
-
-    const userUID = items[0].userUID;
-    console.log(items, userUID);
-    // Create a line_items array for the Stripe checkout session
-    const lineItems = items.map((item) => {
-      const { material, color, dimensions, pricePerUnit, itemId, quantity } = item;
-      return {
-        price_data: {
-          currency: "sgd",
-          unit_amount: Math.round(pricePerUnit * 100), // Convert price to cents
-          product_data: {
-            // productId: itemId,
-            name: itemId,
-            description: color,
-            metadata: {
-              material,
-              dimensions: JSON.stringify(dimensions),
-            },
-            images: [], // You can include image URLs if you have them
-          },
-        },
-        quantity: quantity,
-      };
-    });
-
     try {
+      // Validate and sanitize user input
+      const items = req.body;
+      if (!Array.isArray(items) || items.length === 0) {
+        return res.status(400).json({ error: "Invalid or empty items array" });
+      }
+
+      const userUID = items[0].userUID;
+      console.log(items, userUID);
+
+      // Create line items for the Stripe checkout session
+      const lineItems = items.map((item) => {
+        const {
+          material,
+          color,
+          dimensions,
+          pricePerUnit,
+          itemId,
+          fileName,
+          quantity,
+        } = item;
+        return {
+          price_data: {
+            currency: "sgd",
+            unit_amount: Math.round(pricePerUnit * 100), // Convert price to cents
+            product_data: {
+              name: fileName,
+              description: color,
+              metadata: {
+                material,
+                dimensions: JSON.stringify(dimensions),
+              },
+              images: [], // You can include image URLs if you have them
+            },
+          },
+          quantity: quantity,
+        };
+      });
+
       const session = await stripe.checkout.sessions.create({
         line_items: lineItems,
         mode: "payment",
         success_url: `https://slicerlabs.netlify.app/success?success=true&user_id=${userUID}`,
         cancel_url: `https://slicerlabs.netlify.app/cart?returning_user_id=${userUID}`,
       });
-      // res.redirect(session.url)
-      res.status(200).json({ url: session.url });
 
-      // return res.json(session);
+      // Return the session URL to the client
+      res.status(200).json({ url: session.url });
     } catch (error) {
       // Handle any error that occurred during the creation of the checkout session
       console.error("Error creating checkout session:", error);
