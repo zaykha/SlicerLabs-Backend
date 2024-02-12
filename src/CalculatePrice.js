@@ -27,9 +27,11 @@ export default function calculatePrice(
     RESIN: 0.03, // minutes/mm^3
   };
 
-  const printTimePerUnitVolume = materialSettings
-    ? materialSettings.printTimePerUnitVolume
-    : defaultPrintTimePerUnitVolume;
+  // const printTimePerUnitVolume = materialSettings
+  //   ? materialSettings.printTimePerUnitVolume
+  //   : defaultPrintTimePerUnitVolume;
+    const printTimePerUnitVolume =  materialSettings.printTimePerUnitVolume;
+  
 
   // Define the base cost per gram for different materials
   const defaultmaterialCosts = {
@@ -41,10 +43,11 @@ export default function calculatePrice(
     Resin: 0.1, // SGD per gram
   };
 
-  const materialCosts = materialSettings
-    ? materialSettings.materialCosts
-    : defaultmaterialCosts;
-
+  // const materialCosts = materialSettings
+  //   ? materialSettings.materialCosts
+  //   : defaultmaterialCosts;
+    const materialCosts =  materialSettings.materialCosts;
+  
   // Define the hourly machine usage rate
   const hourlyRate = materialSettings ? materialSettings.hourlyRate : 20; // SGD per hour
 
