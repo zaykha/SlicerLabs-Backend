@@ -145,7 +145,7 @@ MiddleWareapp.post("/validate-price", (req, res) => {
       materialSettings
     );
     const totalPrice = actualPrice * quantity;
-    // console.log(actualPrice, totalPrice, price, quantity);
+    console.log(actualPrice, totalPrice, price, quantity);
     if (totalPrice !== pricePerUnit * quantity) {
       isValid = false;
     }
