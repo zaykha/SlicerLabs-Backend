@@ -371,7 +371,7 @@ MiddleWareapp.post(
         line_items: lineItems,
         mode: "payment",
         success_url: `https://slicerlabs.netlify.app/success?success=true&user_id=${userUID}`,
-        cancel_url: `https://slicerlabs.netlify.app/cart?returning_user_id=${userUID}`,
+        cancel_url: `https://slicerlabs.netlify.app/cancel?cancel=true&cart?returning_user_id=${userUID}`,
       });
 
       // Return the session URL to the client
